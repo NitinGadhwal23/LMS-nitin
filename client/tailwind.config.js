@@ -13,6 +13,9 @@ export default {
         'course-details-heading-large': ['36px', '44px'],
         'default': ['15px', '21px'],
     },
+    gridTemplateColumns: {
+      'auto': 'repeat(auto-fit, minmax(200px, 1fr))',
+    },
   },
 },
   plugins: [],
