@@ -20,7 +20,6 @@ const CoursesList = () => {
       }
   },[allcourses,input])
 
-
   // console.log(input)
   return (
     <>
