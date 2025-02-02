@@ -2,6 +2,7 @@
 import { dummyCourses } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 import humanizeDuration from "humanize-duration";
+import {dummyStudentEnrolled} from '../assets/assets'
 
  export const AppContext = createContext();
 
@@ -11,7 +12,13 @@ import humanizeDuration from "humanize-duration";
 
     const [allcourses, setAllCourses] = useState([]);
     const [isEducator, setIsEducator] = useState(true);
-    
+    const [enrolledCourses, setEnrolledCourses] = useState([]);
+
+
+    const fetchUserEnrolledCourses = async()=>{
+           setEnrolledCourses(dummyCourses)
+    }
+
     const fetchAllCourses = async () => {
          setAllCourses(dummyCourses)
     };
@@ -52,10 +59,11 @@ import humanizeDuration from "humanize-duration";
     }
 
     useEffect(()=>{
-        fetchAllCourses();
+        fetchAllCourses()
+        fetchUserEnrolledCourses()
     },[]);
 
-    const value = {CalculateNoOfLectures,CalculateCourseDuration,CalculateChapterTime,currency,allcourses,navigate,calculateRating,isEducator,setIsEducator};
+    const value = { fetchUserEnrolledCourses,enrolledCourses,CalculateNoOfLectures,CalculateCourseDuration,CalculateChapterTime,currency,allcourses,navigate,calculateRating,isEducator,setIsEducator};
    return <AppContext.Provider value={value}>{props.children}</AppContext.Provider>;
  }
 
