@@ -30,9 +30,75 @@ const AddCourse = () => {
     }
   }, []);
 
+  const handleChapter = (action,chapterId)=>{
+          if(action === 'add'){
+              const title = prompt("Enter Chapter Title");
+              if(title){
+                  const newChapter = {
+                      chapterId:uniqid(),
+                      chapterTitle:title,
+                      collapsed:false,
+                      chapterContent:[],
+                      chapterOrder: chapters.length > 0 ? chapters.slice(-1)[0].chapterOrder + 1 : 1,
+                  }
+                  setChapters([...chapters,newChapter]);
+              }
+          }
+          else if(action === 'remove'){
+              setChapters(chapters.filter(chapter=>chapter.chapterId !== chapterId));
+          }
+          else if(action === "toogle"){
+              setChapters(chapters.map(chapter=>chapter.chapterId === chapterId ? {...chapter,collapsed:!chapter.collapsed} : chapter));
+          }
+  }
+  
+  const handleLecture = (action,chapterId,lectureIndex)=>{
+       if(action === 'add'){
+            setCurrentChapterId(chapterId);
+            setShowPopup(true);
+       }
+       else if(action === 'remove'){
+            setChapters(
+                chapters.map((chapter)=>{
+                   if(chapter.chapterId === chapterId){
+                       chapter.chapterContent.splice(lectureIndex,1);
+                   }
+                    return chapter;
+                })
+            )
+       }
+  }
+
+  const addLecture = ()=>{
+     setChapters(
+       chapters.map((chapter)=>{
+          if(chapter.chapterId === currentChapterId){
+              const newLecture = {
+                 ...lectureDetails,
+                 lectureOrder : chapter.chapterContent.length >0 ? chapter.chapterContent.slice(-1)[0].lectureOrder + 1 : 1,
+                 lectureId:uniqid(),
+              }
+              chapter.chapterContent.push(newLecture);
+          }
+          return chapter;
+       })
+     )
+     setShowPopup(false);
+     setLectureDetails({
+        lectureTitle: "",
+        lectureDuration: "",
+        lectureUrl: "",
+        isPreviewFree: false,
+      });
+  }
+
+  const handleSubmit = async (e) => {
+        e.preventDefault();  
+  }
+
   return (
     <div className="h-screen overflow-scroll flex flex-col items-start justify-between md:p-8 md:pb-0 p-4 pt-8 pb-0">
-      <form className="flex flex-col gap-4 max-w-md w-full text-gray-500">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-md w-full text-gray-500">
         <div className="flex flex-col gap-1">
           <p>Course Title</p>
           <input
@@ -109,6 +175,7 @@ const AddCourse = () => {
                 <div className="flex items-center">
                   <img
                     src={assets.dropdown_icon}
+                    onClick={()=>handleChapter('toogle',chapter.chapterId)}
                     alt=""
                     width={14}
                     className={`mr-2 cursor-pointer transition-all ${
@@ -127,6 +194,7 @@ const AddCourse = () => {
                   src={assets.cross_icon}
                   alt=""
                   className="cursor-pointer"
+                  onClick={()=>handleChapter('remove',chapter.chapterId)}
                 />
               </div>
               {!chapter.collapsed && (
@@ -148,21 +216,108 @@ const AddCourse = () => {
                         </a>{" "}
                         - {lecture.isPreviewFree ? "Free" : "Paid"}
                       </span>
-                      <img src={assets.cross_icon} alt="" className="cursor-pointer"/>
+                      <img
+                        src={assets.cross_icon}
+                        alt=""
+                        className="cursor-pointer"
+                        onClick={()=>handleLecture('remove',chapter.chapterId,index)}
+                      />
                     </div>
                   ))}
-                  <div className="inline-flex p-2 rounded bg-gray-100 cursor-pointer mt-2 ">+ Add Lecture</div>
+                  <div onClick={()=>handleLecture('add',chapter.chapterId)} className="inline-flex p-2 rounded bg-gray-100 cursor-pointer mt-2 ">
+                    + Add Lecture
+                  </div>
                 </div>
               )}
             </div>
           ))}
-          <div className="flex justify-center items-center bg-blue-100 p-2 cursor-pointer rounded-lg ">+ Add Chapter</div>
+          <div onClick={()=>handleChapter('add')} className="flex justify-center items-center bg-blue-100 p-2 cursor-pointer rounded-lg ">
+            + Add Chapter
+          </div>
           {showPopup && (
-             <div className="fixed inset-0 ">
-                
-             </div>
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+              <div className="bg-white p-4 rounded text-gray-700 relative w-full max-w-80">
+                <h2>Add Lecture</h2>
+                <div className="mb-2">
+                  <p>Lecture Title</p>
+                  <input
+                    type="text"
+                    className="mt-1 block w-full border rounded py-1 px-2"
+                    value={lectureDetails.lectureTitle}
+                    onChange={(e) =>
+                      setLectureDetails({
+                        ...lectureDetails,
+                        lectureTitle: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="mb-2">
+                  <p>Duration (minutes)</p>
+                  <input
+                    type="number"
+                    className="mt-1 block w-full border rounded py-1 px-2"
+                    value={lectureDetails.lectureDuration}
+                    onChange={(e) =>
+                      setLectureDetails({
+                        ...lectureDetails,
+                        lectureDuration: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="mb-2">
+                  <p>Lecture URL</p>
+                  <input
+                    type="text"
+                    className="mt-1 block w-full border rounded py-1 px-2"
+                    value={lectureDetails.lectureUrl}
+                    onChange={(e) =>
+                      setLectureDetails({
+                        ...lectureDetails,
+                        lectureUrl: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="mb-2">
+                  <p>Is Preview Free?</p>
+                  <input
+                    type="checkbox"
+                    className="mt-1 scale-125"
+                    value={lectureDetails.isPreviewFree}
+                    onChange={(e) =>
+                      setLectureDetails({
+                        ...lectureDetails,
+                        isPreviewFree: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  className="w-full bg-blue-400 text-white px-4 py-2 rounded"
+                  onClick={addLecture}
+                >
+                  Add
+                </button>
+                <img
+                  onClick={() => setShowPopup(false)}
+                  alt=""
+                  src={assets.cross_icon}
+                  className="absolute top-4 right-4 w-4 cursor-pointer"
+                />
+              </div>
+            </div>
           )}
         </div>
+        <button type="submit" className="bg-black text-white w-max  py-2.5 px-8 rounded my-4">
+          Add
+        </button>
       </form>
     </div>
   );
