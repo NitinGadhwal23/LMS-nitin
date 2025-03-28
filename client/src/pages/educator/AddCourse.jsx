@@ -5,7 +5,7 @@ import { assets } from "../../assets/assets";
 
 const AddCourse = () => {
   const quillRef = useRef(null);
-  const editorRef = useRef(null);
+  const editorRef = useRef(null); 
 
   const [courseTitle, setCourseTitle] = useState("");
   const [coursePrice, setCoursePrice] = useState(0);
