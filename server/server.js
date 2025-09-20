@@ -9,9 +9,9 @@ import connectCloudinary from './config/cloudinary.js'
 import courseRouter from './routes/courseRoute.js'
 import userRouter from './routes/userRoutes.js'
 
-//intialize express
+//intialize expresss
 const app = express()
-
+   
 //connect db
 await connectDB()
 await connectCloudinary()
@@ -36,3 +36,4 @@ const PORT = process.env.PORT || 5000
 app.listen(PORT,()=>{
     console.log(`server is running on port ${PORT}`)
 })
+
